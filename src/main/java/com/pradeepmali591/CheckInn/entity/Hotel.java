@@ -25,10 +25,13 @@ public class Hotel {
     @Column(nullable = false)
     private String city;
 
-    @Column(columnDefinition = "TEXT")
+    @ManyToOne
+    private User owner;
+
+    @Column(columnDefinition = "TEXT[]")
     private String[] photos;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT[]")
     private String[] amenities;
 
     @CreationTimestamp
