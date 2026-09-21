@@ -41,6 +41,16 @@ public class RoomAdminController {
 
     }
 
+    @GetMapping
+    public ResponseEntity<List<RoomResponse>> getAllRoomsInHotel(@PathVariable Long hotelId){
+
+        log.info("Attempting to get list of all room in hotel with ID: {}",hotelId);
+
+        return ResponseEntity.ok(roomService.getAllRoomsInHotel(hotelId));
+    }
+
+
+
 
 
 
