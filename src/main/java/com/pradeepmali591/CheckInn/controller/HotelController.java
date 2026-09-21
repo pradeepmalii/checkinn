@@ -30,6 +30,35 @@ public class HotelController {
 
     @GetMapping("/{hotelId}")
     public ResponseEntity<HotelResponse> getHotelById(@PathVariable Long hotelId){
+        log.info("Attempting to get hotel with ID: "+ hotelId);
+
         return ResponseEntity.ok(hotelService.getHotelById(hotelId));
     }
+
+    @PutMapping("/{hotelId}")
+    public ResponseEntity<HotelResponse> updateHotelById(@PathVariable Long hotelId
+                                                        ,@RequestBody HotelRequest request){
+        log.info("Attempting to update hotel with ID: "+ hotelId);
+
+        return ResponseEntity.ok(hotelService.updateHotelById(hotelId, request));
+    }
+
+    @DeleteMapping("/{hotelId}")
+    public ResponseEntity<Void> deleteHotelById(@PathVariable Long hotelId){
+        log.info("Attempting to delete hotel with ID: "+ hotelId);
+
+        hotelService.deleteHotelById(hotelId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{hotelId}")
+    public ResponseEntity<Void> activateHotelById(@PathVariable Long hotelId){
+        log.info("Attempting to activate hotel with ID: "+hotelId);
+
+        hotelService.activateHotel(hotelId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

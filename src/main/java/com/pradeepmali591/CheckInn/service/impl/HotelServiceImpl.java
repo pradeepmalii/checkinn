@@ -12,10 +12,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class HotelServiceImpl implements HotelService {
 
@@ -46,5 +48,47 @@ public class HotelServiceImpl implements HotelService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
         return modelMapper.map(hotel, HotelResponse.class);
     }
+
+    @Override
+    public HotelResponse updateHotelById(Long id, HotelRequest request) {
+
+        log.info("Updating the hotel with ID: {}", id);
+
+        Hotel hotel = hotelRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
+
+        modelMapper.map(request, hotel);
+
+
+        hotel = hotelRepository.save(hotel);
+
+        return modelMapper.map(hotel, HotelResponse.class);
+    }
+
+    @Override
+    public void deleteHotelById(Long id) {
+        boolean exists = hotelRepository.existsById(id);
+        if(!exists) throw new ResourceNotFoundException("Hotel not found with ID: "+id);
+
+        hotelRepository.deleteById(id);
+        //TODO: delete the future inventories for this hotel
+
+    }
+
+    @Override
+    public void activateHotel(Long id) {
+
+        log.info("Activating the hotel with ID: {}", id);
+
+        Hotel hotel = hotelRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+id));
+
+        hotel.setActive(true);
+        //TODO: Create inventory for all the rooms for this hotel
+    }
+
+
 }
 

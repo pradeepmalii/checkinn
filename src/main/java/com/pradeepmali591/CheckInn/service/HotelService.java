@@ -2,7 +2,6 @@ package com.pradeepmali591.CheckInn.service;
 
 import com.pradeepmali591.CheckInn.dto.hotel.request.HotelRequest;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
-import com.pradeepmali591.CheckInn.entity.Hotel;
 
 public interface HotelService {
 
@@ -10,5 +9,9 @@ public interface HotelService {
 
     HotelResponse getHotelById(Long id);
 
-    
+    HotelResponse updateHotelById(Long id, HotelRequest request);
+
+    void deleteHotelById(Long id);
+
+    void activateHotel(Long id);
 }
