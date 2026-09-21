@@ -32,6 +32,16 @@ public class RoomAdminController {
                 .body(roomService.createNewRoom(hotelId, request));
     }
 
+    @GetMapping("/{roomId}")
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId){
+
+        log.info("Attempting to get room with ID: {}",roomId);
+
+        return ResponseEntity.ok(roomService.getRoomById(roomId));
+
+    }
+
+
 
 
 }

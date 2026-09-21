@@ -29,10 +29,10 @@ public class Room {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal basePrice;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT[]")
     private String[] photos;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT[]")
     private String[] amenities;
 
     @Column(nullable = false)
