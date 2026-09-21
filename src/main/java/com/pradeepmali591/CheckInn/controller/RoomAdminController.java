@@ -49,6 +49,17 @@ public class RoomAdminController {
         return ResponseEntity.ok(roomService.getAllRoomsInHotel(hotelId));
     }
 
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteRoomById(@PathVariable Long roomId){
+
+        log.info("Attempting to delete room with ID: {}",roomId);
+
+        roomService.deleteRoomById(roomId);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
 
 
 
