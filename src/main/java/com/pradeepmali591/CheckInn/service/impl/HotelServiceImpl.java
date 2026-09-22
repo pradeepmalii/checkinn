@@ -3,9 +3,12 @@ package com.pradeepmali591.CheckInn.service.impl;
 import com.pradeepmali591.CheckInn.dto.hotel.request.HotelRequest;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.entity.Hotel;
+import com.pradeepmali591.CheckInn.entity.Room;
 import com.pradeepmali591.CheckInn.exception.ResourceNotFoundException;
 import com.pradeepmali591.CheckInn.repository.HotelRepository;
+import com.pradeepmali591.CheckInn.repository.RoomRepository;
 import com.pradeepmali591.CheckInn.service.HotelService;
+import com.pradeepmali591.CheckInn.service.InventoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class HotelServiceImpl implements HotelService {
 
     HotelRepository hotelRepository;
+    InventoryService inventoryService;
+    RoomRepository roomRepository;
     ModelMapper modelMapper;
 
 
@@ -68,12 +73,18 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     public void deleteHotelById(Long id) {
-        boolean exists = hotelRepository.existsById(id);
-        if(!exists) throw new ResourceNotFoundException("Hotel not found with ID: "+id);
+        Hotel hotel = hotelRepository
+                .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException
+                                ("Hotel not found with Id: "+id));
+
+        //TODO: delete the future inventories for this hotel
+        for(Room room : hotel.getRooms()){
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
+        }
 
         hotelRepository.deleteById(id);
-        //TODO: delete the future inventories for this hotel
-
     }
 
     @Override
@@ -87,6 +98,11 @@ public class HotelServiceImpl implements HotelService {
 
         hotel.setActive(true);
         //TODO: Create inventory for all the rooms for this hotel
+        //assuming only do it once
+        for(Room room: hotel.getRooms()) {
+            inventoryService.initializeRoomForAYear(room);
+        }
+
     }
 
 
