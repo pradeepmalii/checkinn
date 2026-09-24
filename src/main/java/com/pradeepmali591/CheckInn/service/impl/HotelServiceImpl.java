@@ -2,6 +2,8 @@ package com.pradeepmali591.CheckInn.service.impl;
 
 import com.pradeepmali591.CheckInn.dto.hotel.request.HotelRequest;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
+import com.pradeepmali591.CheckInn.dto.hotelInfo.response.HotelInfoResponse;
+import com.pradeepmali591.CheckInn.dto.room.response.RoomResponse;
 import com.pradeepmali591.CheckInn.entity.Hotel;
 import com.pradeepmali591.CheckInn.entity.Room;
 import com.pradeepmali591.CheckInn.exception.ResourceNotFoundException;
@@ -16,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -103,6 +107,26 @@ public class HotelServiceImpl implements HotelService {
             inventoryService.initializeRoomForAYear(room);
         }
 
+    }
+
+    @Override
+    public HotelInfoResponse getHotelInfoById(Long hotelId) {
+
+        log.info("Getting hotel info with ID: "+hotelId);
+
+        Hotel hotel = hotelRepository
+                .findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
+
+        List<RoomResponse> roomResponseList = hotel
+                .getRooms()
+                .stream()
+                .map((element) -> modelMapper.map(element, RoomResponse.class))
+                .toList();
+
+        log.info("Got hotel info with ID: "+hotelId);
+
+        return new HotelInfoResponse(modelMapper.map(hotel, HotelResponse.class), roomResponseList);
     }
 
 
