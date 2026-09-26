@@ -56,13 +56,21 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public void deleteAllInventories(Room room){
+
+        log.info("deleting the inventories of room with ID {}",room.getId() );
+
         LocalDate today = LocalDate.now();
         inventoryRepository.deleteByRoom(room);
+
+        log.info("deleted the inventories of room with ID {}",room.getId() );
 
     }
 
     @Override
     public Page<HotelResponse> searchHotels(HotelSearchRequest request) {
+
+        log.info("Searching the hotels for {} city, from {} to {}",
+                request.getCity(), request.getStartDate(), request.getEndDate());
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         long dateCount =
@@ -76,6 +84,9 @@ public class InventoryServiceImpl implements InventoryService {
                         request.getRoomsCount(),
                         dateCount,
                         pageable);
+
+        log.info("Got the hotels for {} city, from {} to {}",
+                request.getCity(), request.getStartDate(), request.getEndDate());
 
         return hotelPage.map((element) -> modelMapper.map(element, HotelResponse.class));
     }
