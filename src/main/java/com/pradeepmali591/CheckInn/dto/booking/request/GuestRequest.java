@@ -10,8 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GuestRequest {
 
-    Long id;
-    User user;
     String name;
     Gender gender;
     Integer age;

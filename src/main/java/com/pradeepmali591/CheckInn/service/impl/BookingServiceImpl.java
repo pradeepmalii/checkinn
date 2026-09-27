@@ -1,14 +1,12 @@
 package com.pradeepmali591.CheckInn.service.impl;
 
 import com.pradeepmali591.CheckInn.dto.booking.request.BookingRequest;
+import com.pradeepmali591.CheckInn.dto.booking.request.GuestRequest;
 import com.pradeepmali591.CheckInn.dto.booking.response.BookingResponse;
 import com.pradeepmali591.CheckInn.entity.*;
 import com.pradeepmali591.CheckInn.entity.enums.BookingStatus;
 import com.pradeepmali591.CheckInn.exception.ResourceNotFoundException;
-import com.pradeepmali591.CheckInn.repository.BookingRepository;
-import com.pradeepmali591.CheckInn.repository.HotelRepository;
-import com.pradeepmali591.CheckInn.repository.InventoryRepository;
-import com.pradeepmali591.CheckInn.repository.RoomRepository;
+import com.pradeepmali591.CheckInn.repository.*;
 import com.pradeepmali591.CheckInn.service.BookingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -33,6 +32,7 @@ public class BookingServiceImpl implements BookingService {
     HotelRepository hotelRepository;
     BookingRepository bookingRepository;
     ModelMapper modelMapper;
+    GuestRepository guestRepository;
 
     @Override
     @Transactional
@@ -70,19 +70,15 @@ public class BookingServiceImpl implements BookingService {
 
         inventoryRepository.saveAll(inventoryList);
 
-        //Creating the booking
-        User user = new User();
-        user.setId(1L); //TODO: remove dummy user
-
         //TODO: calculate dynamic amount
 
         Booking booking = Booking.builder()
                 .bookingStatus(BookingStatus.RESERVED)
                 .hotel(hotel)
                 .room(room)
-                .checkInDate(request.getCheckOutDate())
+                .checkInDate(request.getCheckInDate())
                 .checkOutDate(request.getCheckOutDate())
-                .user(user)
+                .user(getCurrentUser())
                 .roomCount(request.getRoomCount())
                 .amount(BigDecimal.TEN)
                 .build();
@@ -90,5 +86,50 @@ public class BookingServiceImpl implements BookingService {
         booking = bookingRepository.save(booking);
 
         return modelMapper.map(booking, BookingResponse.class);
+    }
+
+
+    @Override
+    @Transactional
+    public BookingResponse addGuests(Long bookingId, List<GuestRequest> requestList) {
+
+        log.info("Adding guests for booking with id: {}", bookingId);
+
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Booking not found with id: "+bookingId));
+
+        if(hasBookingExpired(booking)) {
+            throw  new IllegalStateException("Booking has already expired");
+        }
+
+        if(booking.getBookingStatus() != BookingStatus.RESERVED){
+            throw new IllegalStateException("Booking is not under reserved state, cannot add guests");
+        }
+
+        for(GuestRequest guestRequest : requestList){
+            Guest guest = modelMapper.map(guestRequest, Guest.class);
+            guest.setUser(getCurrentUser());
+            guest = guestRepository.save(guest);
+            booking.getGuests().add(guest);
+        }
+
+        booking.setBookingStatus(BookingStatus.GUESTS_ADDED);
+        booking = bookingRepository.save(booking);
+
+        return modelMapper.map(booking, BookingResponse.class);
+    }
+
+
+
+    public boolean hasBookingExpired(Booking booking){
+        return booking.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now());
+    }
+
+    public User getCurrentUser(){
+        User user = new User();
+        user.setId(1L); //TODO: REMOVE DUMMY USER
+        return user;
     }
 }

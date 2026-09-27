@@ -1,6 +1,7 @@
 package com.pradeepmali591.CheckInn.controller;
 
 import com.pradeepmali591.CheckInn.dto.booking.request.BookingRequest;
+import com.pradeepmali591.CheckInn.dto.booking.request.GuestRequest;
 import com.pradeepmali591.CheckInn.dto.booking.response.BookingResponse;
 import com.pradeepmali591.CheckInn.service.BookingService;
 import lombok.AccessLevel;
@@ -10,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,5 +28,11 @@ public class HotelBookingController {
         log.info("Attempting to initialize booking in hotel with ID: "+request.getHotelId());
 
         return ResponseEntity.ok(bookingService.initialiseBooking(request));
+    }
+
+    @PostMapping("/{bookingId}/addGuests")
+    public ResponseEntity<BookingResponse> addGuests(@PathVariable Long bookingId,
+                                                     @RequestBody List<GuestRequest> request){
+        return ResponseEntity.ok(bookingService.addGuests(bookingId, request));
     }
 }
