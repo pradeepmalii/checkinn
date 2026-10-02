@@ -1,5 +1,6 @@
 package com.pradeepmali591.CheckInn.controller;
 
+import com.pradeepmali591.CheckInn.dto.booking.response.HotelPriceResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.dto.hotelInfo.response.HotelInfoResponse;
 import com.pradeepmali591.CheckInn.dto.hotelSearch.request.HotelSearchRequest;
@@ -26,7 +27,7 @@ public class HotelBrowserController {
     HotelService hotelService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<HotelResponse>> searchHotels(@RequestBody HotelSearchRequest request){
+    public ResponseEntity<Page<HotelPriceResponse>> searchHotels(@RequestBody HotelSearchRequest request){
 
         log.info("Attempting to search hotel in city: "+request.getCity());
 

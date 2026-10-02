@@ -1,5 +1,6 @@
 package com.pradeepmali591.CheckInn.service;
 
+import com.pradeepmali591.CheckInn.dto.booking.response.HotelPriceResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.dto.hotelSearch.request.HotelSearchRequest;
 import com.pradeepmali591.CheckInn.entity.Room;
@@ -12,5 +13,5 @@ public interface InventoryService {
 
     void deleteAllInventories(Room room);
 
-    Page<HotelResponse> searchHotels(HotelSearchRequest request);
+    Page<HotelPriceResponse> searchHotels(HotelSearchRequest request);
 }

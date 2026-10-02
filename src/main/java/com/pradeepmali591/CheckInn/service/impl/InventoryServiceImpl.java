@@ -1,10 +1,12 @@
 package com.pradeepmali591.CheckInn.service.impl;
 
+import com.pradeepmali591.CheckInn.dto.booking.response.HotelPriceResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.dto.hotelSearch.request.HotelSearchRequest;
 import com.pradeepmali591.CheckInn.entity.Hotel;
 import com.pradeepmali591.CheckInn.entity.Inventory;
 import com.pradeepmali591.CheckInn.entity.Room;
+import com.pradeepmali591.CheckInn.repository.HotelMinPriceRepository;
 import com.pradeepmali591.CheckInn.repository.InventoryRepository;
 import com.pradeepmali591.CheckInn.service.InventoryService;
 import lombok.AccessLevel;
@@ -31,6 +33,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     InventoryRepository inventoryRepository;
     ModelMapper modelMapper;
+    HotelMinPriceRepository hotelMinPriceRepository;
 
     @Override
     public void initializeRoomForAYear(Room room) {
@@ -72,7 +75,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Page<HotelResponse> searchHotels(HotelSearchRequest request) {
+    public Page<HotelPriceResponse> searchHotels(HotelSearchRequest request) {
 
         log.info("Searching the hotels for {} city, from {} to {}",
                 request.getCity(), request.getStartDate(), request.getEndDate());
@@ -81,7 +84,7 @@ public class InventoryServiceImpl implements InventoryService {
         long dateCount =
                 ChronoUnit.DAYS.between(request.getStartDate(), request.getEndDate()) + 1;
 
-        Page<Hotel> hotelPage = inventoryRepository
+        Page<HotelPriceResponse> hotelPage = hotelMinPriceRepository
                 .findHotelsWithAvailableInventory(
                         request.getCity(),
                         request.getStartDate(),
@@ -93,6 +96,6 @@ public class InventoryServiceImpl implements InventoryService {
         log.info("Got the hotels for {} city, from {} to {}",
                 request.getCity(), request.getStartDate(), request.getEndDate());
 
-        return hotelPage.map((element) -> modelMapper.map(element, HotelResponse.class));
+        return hotelPage.map((element) -> modelMapper.map(element, HotelPriceResponse.class));
     }
 }
