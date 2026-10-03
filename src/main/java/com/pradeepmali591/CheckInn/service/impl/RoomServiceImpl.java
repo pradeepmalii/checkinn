@@ -4,7 +4,9 @@ import com.pradeepmali591.CheckInn.dto.room.request.RoomRequest;
 import com.pradeepmali591.CheckInn.dto.room.response.RoomResponse;
 import com.pradeepmali591.CheckInn.entity.Hotel;
 import com.pradeepmali591.CheckInn.entity.Room;
+import com.pradeepmali591.CheckInn.entity.User;
 import com.pradeepmali591.CheckInn.exception.ResourceNotFoundException;
+import com.pradeepmali591.CheckInn.exception.UnAuthorisedException;
 import com.pradeepmali591.CheckInn.repository.HotelRepository;
 import com.pradeepmali591.CheckInn.repository.RoomRepository;
 import com.pradeepmali591.CheckInn.service.InventoryService;
@@ -15,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +69,12 @@ public class RoomServiceImpl implements RoomService {
                 .findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with ID: "+hotelId));
 
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorisedException("This user does not own this hotel with id: "+hotelId);
+        }
+
+
         log.info("Got List of Room in hotel with ID: {}", hotelId);
 
         return hotel.getRooms()
@@ -96,6 +105,11 @@ public class RoomServiceImpl implements RoomService {
                 .findById(roomId)
                         .orElseThrow(() -> new ResourceNotFoundException
                                 ("Room not found with ID: "+roomId));
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(room.getHotel().getOwner())){
+            throw new UnAuthorisedException("This user does not own this room with id: "+roomId);
+        }
 
         //TODO: delete all future inventory for this room
         inventoryService.deleteAllInventories(room);
