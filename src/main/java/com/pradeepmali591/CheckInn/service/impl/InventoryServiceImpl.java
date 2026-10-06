@@ -50,7 +50,7 @@ public class InventoryServiceImpl implements InventoryService {
                     .city(room.getHotel().getCity())
                     .date(today)
                     .price(room.getBasePrice())
-                    .SurgeFactor(BigDecimal.ONE)
+                    .surgeFactor(BigDecimal.ONE)
                     .totalCount(room.getTotalCount())
                     .closed(false)
                     .build();
