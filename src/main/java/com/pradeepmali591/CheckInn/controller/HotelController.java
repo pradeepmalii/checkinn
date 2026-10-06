@@ -1,7 +1,9 @@
 package com.pradeepmali591.CheckInn.controller;
 
+import com.pradeepmali591.CheckInn.dto.booking.response.BookingResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.request.HotelRequest;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
+import com.pradeepmali591.CheckInn.service.BookingService;
 import com.pradeepmali591.CheckInn.service.HotelService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/hotels")
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class HotelController {
 
     HotelService hotelService;
+    BookingService bookingService;
 
     @PostMapping
     public ResponseEntity<HotelResponse> createNewHotel(@RequestBody HotelRequest request){
@@ -64,6 +69,11 @@ public class HotelController {
     @GetMapping
     public ResponseEntity<List<HotelResponse>> getAllHotels() {
         return ResponseEntity.ok(hotelService.getAllHotels());
+    }
+
+    @GetMapping("/{hotelId}/bookings")
+    public ResponseEntity<List<BookingResponse>> getAllBookingsByHotelId(@PathVariable Long hotelId) {
+        return ResponseEntity.ok(bookingService.getAllBookingsByHotelId(hotelId));
     }
 
 

@@ -22,4 +22,6 @@ public interface BookingService {
     void cancelBooking(Long bookingId);
 
     Object getBookingStatus(Long bookingId);
+
+    List<BookingResponse> getAllBookingsByHotelId(Long hotelId);
 }
