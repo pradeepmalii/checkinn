@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.pradeepmali591.CheckInn.util.AppUtils.getCurrentUser;
 
 @Service
 @Slf4j
@@ -154,6 +157,18 @@ public class HotelServiceImpl implements HotelService {
         log.info("Got hotel info with ID: "+hotelId);
 
         return new HotelInfoResponse(modelMapper.map(hotel, HotelResponse.class), roomResponseList);
+    }
+
+    @Override
+    public List<HotelResponse> getAllHotels() {
+        User user = getCurrentUser();
+        log.info("Getting all hotels for the admin user with ID: {}", user.getId());
+        List<Hotel> hotels = hotelRepository.findByOwner(user);
+
+        return hotels
+                .stream()
+                .map((element) -> modelMapper.map(element, HotelResponse.class))
+                .collect(Collectors.toList());
     }
 
 

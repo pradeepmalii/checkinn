@@ -5,6 +5,8 @@ import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.dto.hotelInfo.response.HotelInfoResponse;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
+
 public interface HotelService {
 
     HotelResponse createNewHotel(HotelRequest request);
@@ -18,4 +20,6 @@ public interface HotelService {
     void activateHotel(Long id);
 
     HotelInfoResponse getHotelInfoById(Long hotelId);
+
+    List<HotelResponse> getAllHotels();
 }
