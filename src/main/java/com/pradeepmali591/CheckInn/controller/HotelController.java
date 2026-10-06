@@ -2,6 +2,7 @@ package com.pradeepmali591.CheckInn.controller;
 
 import com.pradeepmali591.CheckInn.dto.booking.response.BookingResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.request.HotelRequest;
+import com.pradeepmali591.CheckInn.dto.hotel.response.HotelReportResponse;
 import com.pradeepmali591.CheckInn.dto.hotel.response.HotelResponse;
 import com.pradeepmali591.CheckInn.service.BookingService;
 import com.pradeepmali591.CheckInn.service.HotelService;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -74,6 +76,17 @@ public class HotelController {
     @GetMapping("/{hotelId}/bookings")
     public ResponseEntity<List<BookingResponse>> getAllBookingsByHotelId(@PathVariable Long hotelId) {
         return ResponseEntity.ok(bookingService.getAllBookingsByHotelId(hotelId));
+    }
+
+    @GetMapping("/{hotelId}/reports")
+    public ResponseEntity<HotelReportResponse> getHotelReport(@PathVariable Long hotelId,
+                                                              @RequestParam(required = false) LocalDate startDate,
+                                                              @RequestParam(required = false) LocalDate endDate) {
+
+        if (startDate == null) startDate = LocalDate.now().minusMonths(1);
+        if (endDate == null) endDate = LocalDate.now();
+
+        return ResponseEntity.ok(bookingService.getHotelReport(hotelId, startDate, endDate));
     }
 
 

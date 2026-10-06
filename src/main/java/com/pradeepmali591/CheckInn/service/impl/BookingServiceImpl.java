@@ -3,6 +3,7 @@ package com.pradeepmali591.CheckInn.service.impl;
 import com.pradeepmali591.CheckInn.dto.booking.request.BookingRequest;
 import com.pradeepmali591.CheckInn.dto.booking.request.GuestRequest;
 import com.pradeepmali591.CheckInn.dto.booking.response.BookingResponse;
+import com.pradeepmali591.CheckInn.dto.hotel.response.HotelReportResponse;
 import com.pradeepmali591.CheckInn.entity.*;
 import com.pradeepmali591.CheckInn.entity.enums.BookingStatus;
 import com.pradeepmali591.CheckInn.exception.ResourceNotFoundException;
@@ -28,7 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
@@ -279,6 +283,40 @@ public class BookingServiceImpl implements BookingService {
                 .map((element) -> modelMapper.map(element, BookingResponse.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public HotelReportResponse getHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate) {
+
+        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new ResourceNotFoundException("Hotel not " +
+                "found with ID: "+hotelId));
+        User user = getCurrentUser();
+
+        log.info("Generating report for hotel with ID: {}", hotelId);
+
+        if(!user.equals(hotel.getOwner())) throw new AccessDeniedException("You are not the owner of hotel with id: "+hotelId);
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        List<Booking> bookings = bookingRepository.findByHotelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
+
+        Long totalConfirmedBookings = bookings
+                .stream()
+                .filter(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+                .count();
+
+        BigDecimal totalRevenueOfConfirmedBookings = bookings.stream()
+                .filter(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+                .map(Booking::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal avgRevenue = totalConfirmedBookings == 0 ? BigDecimal.ZERO :
+                totalRevenueOfConfirmedBookings.divide(BigDecimal.valueOf(totalConfirmedBookings), RoundingMode.HALF_UP);
+
+        return new HotelReportResponse(totalConfirmedBookings, totalRevenueOfConfirmedBookings, avgRevenue);
+    }
+
+
 
 
 
