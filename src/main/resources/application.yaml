@@ -21,6 +21,9 @@ server:
     servlet:
       context-path: /api/v1
 
+frontend:
+  url: http://localhost:8081
+
 jwt:
   secretKey: ${JWT_SECRETKEY}
 

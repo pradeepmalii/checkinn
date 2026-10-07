@@ -28,4 +28,6 @@ public interface BookingService {
     List<BookingResponse> getAllBookingsByHotelId(Long hotelId);
 
     HotelReportResponse getHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate);
+
+    List<BookingResponse> getMyBookings();
 }

@@ -316,9 +316,15 @@ public class BookingServiceImpl implements BookingService {
         return new HotelReportResponse(totalConfirmedBookings, totalRevenueOfConfirmedBookings, avgRevenue);
     }
 
+    @Override
+    public List<BookingResponse> getMyBookings() {
+        User user = getCurrentUser();
 
-
-
+        return bookingRepository.findByUser(user)
+                .stream().
+                map((element) -> modelMapper.map(element, BookingResponse.class))
+                .collect(Collectors.toList());
+    }
 
 
     public boolean hasBookingExpired(Booking booking){
