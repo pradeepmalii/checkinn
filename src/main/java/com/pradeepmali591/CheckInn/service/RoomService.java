@@ -2,6 +2,7 @@ package com.pradeepmali591.CheckInn.service;
 
 import com.pradeepmali591.CheckInn.dto.room.request.RoomRequest;
 import com.pradeepmali591.CheckInn.dto.room.response.RoomResponse;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -15,5 +16,5 @@ public interface RoomService {
 
     void deleteRoomById(Long roomId);
 
-
+    RoomResponse updateRoomById(Long hotelId, Long roomId, RoomRequest request);
 }
